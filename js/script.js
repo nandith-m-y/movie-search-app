@@ -6,9 +6,16 @@ const movieContainer = document.getElementById("movieContainer");
 const loading = document.getElementById("loading");
 const errorMessage = document.getElementById("errorMessage");
 const welcome = document.getElementById("welcome");
+const themeToggle = document.getElementById("themeToggle");
+const recentSearches = document.getElementById("recentSearches");
 
-async function searchMovie() {
-    const movieName = movieInput.value.trim();
+movieInput.focus();
+
+loadTheme();
+loadRecentSearches();
+
+async function searchMovie(movie = null) {
+    const movieName = movie || movieInput.value.trim();
 
     if (movieName === "") {
         alert("Please enter a movie name");
@@ -34,21 +41,48 @@ async function searchMovie() {
             return;
         }
 
+        saveRecentSearch(movieName);
+
         movieContainer.innerHTML = `
             <div class="movie-card">
-                <img src="${data.Poster}" alt="${data.Title}">
-                
+
+                <img 
+                    src="${data.Poster !== "N/A" ? data.Poster : "https://via.placeholder.com/300x450"}" 
+                    alt="${data.Title}"
+                >
+
                 <div class="movie-info">
+
                     <h2>${data.Title}</h2>
 
-                    <p><strong>Year:</strong> ${data.Year}</p>
+                    <div class="rating">
+                        ⭐ IMDb ${data.imdbRating}
+                    </div>
 
-                    <p><strong>IMDb Rating:</strong> ${data.imdbRating}</p>
+                    <p><strong>📅 Year:</strong> ${data.Year}</p>
 
-                    <p><strong>Genre:</strong> ${data.Genre}</p>
+                    <p><strong>🎭 Genre:</strong> ${data.Genre}</p>
 
-                    <p><strong>Plot:</strong> ${data.Plot}</p>
+                    <p><strong>⏱ Runtime:</strong> ${data.Runtime}</p>
+
+                    <p><strong>🎬 Director:</strong> ${data.Director}</p>
+
+                    <p><strong>👨‍🎤 Actors:</strong> ${data.Actors}</p>
+
+                    <p><strong>🌍 Language:</strong> ${data.Language}</p>
+
+                    <p><strong>🏳 Country:</strong> ${data.Country}</p>
+
+                    <p><strong>🏆 Awards:</strong> ${data.Awards}</p>
+
+                    <p><strong>💰 Box Office:</strong> ${data.BoxOffice}</p>
+
+                    <p><strong>📝 Plot:</strong></p>
+
+                    <p>${data.Plot}</p>
+
                 </div>
+
             </div>
         `;
     } catch (error) {
@@ -57,9 +91,79 @@ async function searchMovie() {
     }
 }
 
-searchBtn.addEventListener("click", searchMovie);
+function saveRecentSearch(movie) {
 
-movieInput.addEventListener("keypress", (event) => {
+    let searches =
+        JSON.parse(localStorage.getItem("recentMovies")) || [];
+
+    searches = searches.filter(
+        item => item.toLowerCase() !== movie.toLowerCase()
+    );
+
+    searches.unshift(movie);
+
+    searches = searches.slice(0, 5);
+
+    localStorage.setItem(
+        "recentMovies",
+        JSON.stringify(searches)
+    );
+
+    loadRecentSearches();
+}
+
+function loadRecentSearches() {
+
+    const searches =
+        JSON.parse(localStorage.getItem("recentMovies")) || [];
+
+    if (searches.length === 0) {
+        recentSearches.innerHTML = "";
+        return;
+    }
+
+    recentSearches.innerHTML = `
+        <h3>Recent Searches</h3>
+        ${searches
+            .map(
+                movie =>
+                    `<button onclick="searchMovie('${movie}')">${movie}</button>`
+            )
+            .join("")}
+    `;
+}
+
+themeToggle.addEventListener("click", () => {
+
+    document.body.classList.toggle("light");
+
+    if (document.body.classList.contains("light")) {
+        localStorage.setItem("theme", "light");
+        themeToggle.textContent = "🌙";
+    } else {
+        localStorage.setItem("theme", "dark");
+        themeToggle.textContent = "☀️";
+    }
+});
+
+function loadTheme() {
+
+    const theme = localStorage.getItem("theme");
+
+    if (theme === "light") {
+        document.body.classList.add("light");
+        themeToggle.textContent = "🌙";
+    } else {
+        themeToggle.textContent = "☀️";
+    }
+}
+
+searchBtn.addEventListener("click", () => {
+    searchMovie();
+});
+
+movieInput.addEventListener("keypress", event => {
+
     if (event.key === "Enter") {
         searchMovie();
     }
