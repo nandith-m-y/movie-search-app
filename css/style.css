@@ -287,15 +287,7 @@ strong{
     font-weight:600;
 }
 
-footer{
-    text-align:center;
-    padding:25px;
-    margin-top:auto;
-}
 
-footer p{
-    margin:5px 0;
-}
 
 @media(max-width:768px){
 
@@ -379,4 +371,41 @@ footer p{
 
 .suggestions li:hover{
     background:#e5e7eb;
+}
+.footer{
+    margin-top:auto;
+
+    display:flex;
+    justify-content:center;
+    gap:120px;
+
+    padding:30px 20px;
+
+    background:rgba(255,255,255,0.05);
+
+    backdrop-filter:blur(10px);
+
+    border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.footer-column{
+    text-align:center;
+}
+
+.footer-column h3{
+    color:#38bdf8;
+    margin-bottom:10px;
+}
+
+.footer-column p{
+    margin:0;
+}
+
+@media(max-width:768px){
+
+    .footer{
+        flex-direction:column;
+        gap:20px;
+    }
+
 }
